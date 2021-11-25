@@ -15,6 +15,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with PYBOSSA.  If not, see <http://www.gnu.org/licenses/>.
+import os
 
 DEBUG = False
 
@@ -23,7 +24,9 @@ HOST = '0.0.0.0'
 PORT = 5000
 
 SECRET = 'foobar'
-SECRET_KEY = 'my-session-secret'
+SECRET_KEY = os.environ.get("PYBOSSA_SESSION_SECRET_KEY", "my-session-secret")
+
+SQLALCHEMY_DATABASE_URI = os.environ.get("PYBOSSA_POSTRESQL_URI")
 
 ITSDANGEROUSKEY = 'its-dangerous-key'
 
@@ -59,6 +62,7 @@ ENABLE_DEBUG_TOOLBAR = False
 # Cache default key prefix
 REDIS_SENTINEL = [('localhost', 26379)]
 REDIS_MASTER = 'mymaster'
+REDIS_PASSWORD = SECRET_KEY = os.environ.get("PYBOSSA_REDIS_PASSWORD")
 REDIS_DB = 0
 REDIS_SOCKET_TIMEOUT = None
 REDIS_RETRY_ON_TIMEOUT = True

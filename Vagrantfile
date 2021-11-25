@@ -14,6 +14,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network :forwarded_port, host: 5001, guest: 5001
   # turn off warning message `stdin: is not a tty error`
   config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
-  config.vm.provision "shell", path: "contrib/server.sh"
-  config.vm.provision "shell", path: "contrib/pybossa.sh", privileged: false
+  config.vm.provision "shell", name: "server", path: "contrib/server.sh"
+  config.vm.provision "shell", name: "python", path: "contrib/python.sh", privileged: false
+  config.vm.provision "shell", name: "pybossa", path: "contrib/pybossa.sh", privileged: false
+  config.vm.provision "shell", name: "provision", path: "contrib/provision.sh", privileged: false
+  config.vm.provision "shell", name: "run", path: "contrib/run.sh", privileged: false, run: "never"
+  config.vm.provision "shell", name: "test", path: "contrib/test.sh", privileged: false, run: "never"
 end

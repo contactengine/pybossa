@@ -3,9 +3,15 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 from logging.config import fileConfig
 
+import os
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+
+# interpolate config against environment
+section = config.config_ini_section
+config.set_section_option(section, "DB_CONN_STR", os.environ.get("PYBOSSA_POSTRESQL_URI"))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
