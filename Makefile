@@ -1,14 +1,17 @@
+ROOT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 APP_NAME := pybossa
 APP_VERSION ?= 4.0.2
-IMAGE_REPOSITORY := $(APP_NAME)
 DOCKERFILE_PATH ?= Dockerfile
 DOCKER_BUILD_CONTEXT ?= .
-
 COMMIT = $(shell git rev-parse --short HEAD)
 
 clean:
+ifndef IMAGE_REPOSITORY
+	$(error IMAGE_REPOSITORY is not defined)
+endif
 	docker rmi -f $(IMAGE_REPOSITORY)
 	docker rmi -f $(IMAGE_REPOSITORY):$(APP_VERSION)
+	docker rmi -f $(IMAGE_REPOSITORY):$(COMMIT)
 	docker image prune -f
 
 lint:
@@ -16,7 +19,10 @@ lint:
 	docker run --rm -i hadolint/hadolint:$(hadolint_version) < $(DOCKERFILE_PATH)
 
 build: DOCKER_CONTENT_TRUST=1
-build: lint
+build:
+ifndef IMAGE_REPOSITORY
+	$(error IMAGE_REPOSITORY is not defined)
+endif
 	docker build \
 		-t $(IMAGE_REPOSITORY) \
 		-t $(IMAGE_REPOSITORY):$(APP_VERSION) \
@@ -29,6 +35,9 @@ build: lint
 scan: build scan-dockle scan-trivy
 
 scan-dockle:
+ifndef IMAGE_REPOSITORY
+	$(error IMAGE_REPOSITORY is not defined)
+endif
 	$(eval $(call latest_github_release,dockle_version,goodwithtech,dockle))
 	$(eval dockle_version=v$(dockle_version))
 	docker run --rm \
@@ -39,6 +48,9 @@ scan-dockle:
 		$(IMAGE_REPOSITORY):$(APP_VERSION)
 
 scan-trivy:
+ifndef IMAGE_REPOSITORY
+	$(error IMAGE_REPOSITORY is not defined)
+endif
 	$(eval $(call latest_github_release,trivy_version,aquasecurity,trivy))
 ifdef XDG_CONFIG_HOME
 	docker run --rm \
@@ -58,8 +70,21 @@ else
 		$(IMAGE_REPOSITORY):$(APP_VERSION)
 endif
 
-publish:
-	docker tag $(IMAGE_REPOSITORY):$(APP_VERSION) $(IMAGE_REPOSITORY):$(COMMIT)
+ifeq ($(MAKECMDGOALS), publish)
+ifndef CONTAINER_REGISTRY
+$(error CONTAINER_REGISTRY is not defined)
+endif
+include $(ROOT_DIR)$(shell echo $(CONTAINER_REGISTRY) | tr A-Z a-z).mk
+publish: login-to-container-registry
+ifndef IMAGE_REPOSITORY
+	$(error IMAGE_REPOSITORY is not defined)
+endif
+ifndef CONTAINER_REGISTRY_HOST
+	$(error CONTAINER_REGISTRY_HOST is not defined)
+endif
+	docker tag $(IMAGE_REPOSITORY):$(APP_VERSION) $(CONTAINER_REGISTRY_HOST)/$(IMAGE_REPOSITORY):$(APP_VERSION)
+	docker push $(CONTAINER_REGISTRY_HOST)/$(IMAGE_REPOSITORY):$(APP_VERSION)
+endif
 
 define latest_github_release =
  $(1) = $(shell \
