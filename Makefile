@@ -1,6 +1,6 @@
 ROOT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 APP_NAME := pybossa
-APP_VERSION ?= 4.0.2
+APP_VERSION ?= 4.1.0
 DOCKERFILE_PATH ?= Dockerfile
 DOCKER_BUILD_CONTEXT ?= .
 COMMIT = $(shell git rev-parse --short HEAD)
@@ -9,9 +9,11 @@ clean:
 ifndef IMAGE_REPOSITORY
 	$(error IMAGE_REPOSITORY is not defined)
 endif
+	docker rmi -f $(APP_NAME)
+	docker rmi -f $(APP_NAME):$(APP_VERSION)
 	docker rmi -f $(IMAGE_REPOSITORY)
 	docker rmi -f $(IMAGE_REPOSITORY):$(APP_VERSION)
-	docker rmi -f $(IMAGE_REPOSITORY):$(COMMIT)
+	docker rmi -f $(CONTAINER_REGISTRY_HOST)/$(IMAGE_REPOSITORY):$(APP_VERSION)
 	docker image prune -f
 
 lint:
@@ -24,8 +26,8 @@ ifndef IMAGE_REPOSITORY
 	$(error IMAGE_REPOSITORY is not defined)
 endif
 	docker build \
-		-t $(IMAGE_REPOSITORY) \
-		-t $(IMAGE_REPOSITORY):$(APP_VERSION) \
+		-t $(APP_NAME) \
+		-t $(APP_NAME):$(APP_VERSION) \
 		-f $(DOCKERFILE_PATH) \
 		--build-arg APP_NAME="$(APP_NAME)" \
 		--build-arg VERSION="$(APP_VERSION)" \
@@ -82,7 +84,9 @@ endif
 ifndef CONTAINER_REGISTRY_HOST
 	$(error CONTAINER_REGISTRY_HOST is not defined)
 endif
-	docker tag $(IMAGE_REPOSITORY):$(APP_VERSION) $(CONTAINER_REGISTRY_HOST)/$(IMAGE_REPOSITORY):$(APP_VERSION)
+	docker tag $(APP_NAME) $(IMAGE_REPOSITORY)
+	docker tag $(APP_NAME):$(APP_VERSION) $(IMAGE_REPOSITORY):$(APP_VERSION)
+	docker tag $(APP_NAME):$(APP_VERSION) $(CONTAINER_REGISTRY_HOST)/$(IMAGE_REPOSITORY):$(APP_VERSION)
 	docker push $(CONTAINER_REGISTRY_HOST)/$(IMAGE_REPOSITORY):$(APP_VERSION)
 endif
 

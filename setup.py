@@ -41,7 +41,7 @@ requirements = [
     "flask-profiler==1.6",
     "Flask-SimpleLDAP>=1.1.2",
     "Flask-SQLAlchemy>=2.3.2",
-    "Flask-WTF>=0.9.5",
+    "Flask-WTF>=0.9.5,<1.0.0",
     "flatten-json==0.1.6",
     "google-api-python-client==1.5.5",
     "html2text==2014.7.3",
@@ -134,7 +134,7 @@ requirements = [
     "webassets==0.12.1",
     "Werkzeug",
     "wrapt==1.10.11",
-    "WTForms>=1.0.5",
+    "WTForms>=1.0.5,<3.0.0",
     "WTForms-Components>=0.10.3",
     "yacryptopan==1.0.0",
     "email_validator==1.1.1"
