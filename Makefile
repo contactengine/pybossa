@@ -1,6 +1,6 @@
 ROOT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 APP_NAME := pybossa
-APP_VERSION ?= 4.1.0
+APP_VERSION ?= 4.1.11
 DOCKERFILE_PATH ?= Dockerfile
 DOCKER_BUILD_CONTEXT ?= .
 COMMIT = $(shell git rev-parse --short HEAD)

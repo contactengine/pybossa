@@ -24,7 +24,7 @@ HOST = '0.0.0.0'
 PORT = 5000
 
 SECRET = 'foobar'
-SECRET_KEY = os.environ.get("PYBOSSA_SESSION_SECRET_KEY", "my-session-secret")
+SECRET_KEY = os.environ.get("PYBOSSA_SESSION_SECRET_KEY")
 
 SQLALCHEMY_DATABASE_URI = os.environ.get("PYBOSSA_POSTRESQL_URI")
 
@@ -62,7 +62,7 @@ ENABLE_DEBUG_TOOLBAR = False
 # Cache default key prefix
 REDIS_SENTINEL = [('localhost', 26379)]
 REDIS_MASTER = 'mymaster'
-REDIS_PASSWORD = SECRET_KEY = os.environ.get("PYBOSSA_REDIS_PASSWORD")
+REDIS_PASSWORD = os.environ.get("PYBOSSA_REDIS_PASSWORD")
 REDIS_DB = 0
 REDIS_SOCKET_TIMEOUT = None
 REDIS_RETRY_ON_TIMEOUT = True

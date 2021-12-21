@@ -41,13 +41,13 @@ RUN apt-get update \
   dumb-init=1.2.2-1.1 \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
-  && addgroup --system --gid 2000 pybossa \
+  && addgroup --system --gid 2000 --no-create-home pybossa \
   && adduser --system --uid 1000 --ingroup pybossa --disabled-password --gecos "" pybossa
 
-WORKDIR /home/pybossa
-COPY --from=build --chown=pybossa:pybossa /app .
+COPY --from=build --chown=pybossa:pybossa /app /app
+WORKDIR /app
 
-ENV VIRTUAL_ENV=/home/pybossa/venv
+ENV VIRTUAL_ENV=/app/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]

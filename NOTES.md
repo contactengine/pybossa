@@ -17,6 +17,9 @@ apt-get -y install redis-tools
 
 redis-cli -h HOST -a PASSWORD -p PORT ping
 # pong
+
+# list all keys
+keys "*"
 ```
 
 ## PostgresSQL
