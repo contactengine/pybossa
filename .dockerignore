@@ -1,3 +1,20 @@
+Dockerfile
+
+# development
+.git
+.gitignore
+.editorconfig
+.eslintignore
+.prettierrc.json
+.dockleignore
+.tool-versions
+.env
+
+# logs
+logs
+*.log
+
+# python
 __pycache__
 *.pyc
 *.pyo
@@ -18,3 +35,6 @@ coverage.xml
 .mypy_cache
 .pytest_cache
 .hypothesis
+
+# js release artefacts
+**/yarn.lock

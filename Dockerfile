@@ -33,7 +33,8 @@ COPY pybossa/ pybossa/
 
 FROM python:3.8-slim-buster
 
-RUN apt-get update \
+RUN chmod -R ug-s /bin /sbin /usr/bin \
+  && apt-get update \
   && apt-get -y upgrade \
   && DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install \
   postgresql-client=11+200+deb10u4 \
@@ -42,7 +43,8 @@ RUN apt-get update \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && addgroup --system --gid 2000 --no-create-home pybossa \
-  && adduser --system --uid 1000 --ingroup pybossa --disabled-password --gecos "" pybossa
+  && adduser --system --uid 1000 --ingroup pybossa --disabled-password --gecos "" pybossa \
+  && rm -rf /tmp/*
 
 COPY --from=build --chown=pybossa:pybossa /app /app
 WORKDIR /app
