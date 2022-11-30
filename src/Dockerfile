@@ -10,9 +10,9 @@ LABEL org.opencontainers.image.title=pybossa \
 RUN apt-get update \
   && apt-get -y upgrade \
   && DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install \
-  libsasl2-dev=2.1.27+dfsg-1+deb10u1 \
-  libldap2-dev=2.4.47+dfsg-3+deb10u6 \
-  libssl-dev=1.1.1d-0+deb10u7 \
+  libsasl2-dev=2.1.27+dfsg-1+deb10u2 \
+  libldap2-dev=2.4.47+dfsg-3+deb10u7 \
+  libssl-dev=1.1.1n-0+deb10u3 \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
@@ -37,8 +37,8 @@ RUN chmod -R ug-s /bin /sbin /usr/bin \
   && apt-get update \
   && apt-get -y upgrade \
   && DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install \
-  postgresql-client=11+200+deb10u4 \
-  redis-tools=5:5.0.14-1+deb10u1 \
+  postgresql-client=11+200+deb10u5 \
+  redis-tools=5:5.0.14-1+deb10u2 \
   dumb-init=1.2.2-1.1 \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
@@ -56,4 +56,4 @@ ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD ["python", "run.py"]
 
 EXPOSE 5000
-USER pybossa
+USER 1000

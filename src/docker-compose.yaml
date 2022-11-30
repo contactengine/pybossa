@@ -1,0 +1,83 @@
+networks:
+  pybossa_frontend:
+    external: true
+
+  pybossa_backend:
+    external: true
+
+services:
+  provision:
+    image: ai/pybossa
+    restart: on-failure
+    volumes:
+      - ../build/environments/$ENV_NAME/settings_local.py:/app/settings_local.py
+      - ../build/environments/$ENV_NAME/alembic.ini:/app/alembic.ini
+      - ../build/shared-storage/uploads:/home/pybossa/uploads
+    environment:
+      - PYBOSSA_POSTRESQL_URI=$PYBOSSA_POSTRESQL_URI
+    command:
+      - python
+      - cli.py
+      - db_create
+    networks:
+      - pybossa_backend
+
+  pybossa:
+    image: ai/pybossa
+    restart: on-failure
+    volumes:
+      - ../build/environments/$ENV_NAME/settings_local.py:/app/settings_local.py
+      - ../build/environments/$ENV_NAME/alembic.ini:/app/alembic.ini
+      - ../build/shared-storage/uploads:/home/pybossa/uploads
+    environment:
+      - VIRTUAL_HOST=$PYBOSSA_NGINX_VIRTUAL_HOST
+      - VIRTUAL_PORT=$PYBOSSA_NGINX_VIRTUAL_PORT
+      - VIRTUAL_PATH=$PYBOSSA_NGINX_VIRTUAL_PATH
+      - PYBOSSA_POSTRESQL_URI=$PYBOSSA_POSTRESQL_URI
+      - PYBOSSA_REDIS_PASSWORD=$PYBOSSA_REDIS_PASSWORD
+      # These dont appear to be required
+      # - RQ_DASHBOARD_REDIS_URL='redis://redis:6379'
+      # - RQ_DASHBOARD_PASSWORD=$PYBOSSA_REDIS_PASSWORD
+    depends_on:
+      - provision
+    networks:
+      - pybossa_backend
+      - pybossa_frontend
+
+  scheduler:
+    image: ai/pybossa
+    command:
+      - rqscheduler
+      - --host=redis
+      - --port=6379
+      - --password=$PYBOSSA_REDIS_PASSWORD
+      - --interval=60
+      - --db=0
+    restart: on-failure
+    networks:
+      - pybossa_backend
+
+  worker:
+    image: ai/pybossa
+    command:
+      - python
+      - app_context_rqworker.py
+      - scheduled_jobs
+      - super
+      - high
+      - medium
+      - low
+      - email
+      - maintenance
+    restart: on-failure
+    volumes:
+      - ../build/environments/$ENV_NAME/settings_local.py:/app/settings_local.py
+      - ../build/environments/$ENV_NAME/alembic.ini:/app/alembic.ini
+      - ../build/shared-storage/uploads:/home/pybossa/uploads
+    environment:
+      - PYBOSSA_POSTRESQL_URI=$PYBOSSA_POSTRESQL_URI
+      - PYBOSSA_REDIS_PASSWORD=$PYBOSSA_REDIS_PASSWORD
+    depends_on:
+      - scheduler
+    networks:
+      - pybossa_backend
