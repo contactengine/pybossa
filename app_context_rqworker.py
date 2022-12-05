@@ -22,13 +22,16 @@ from rq import Queue, Connection, Worker
 
 from pybossa.core import create_app, sentinel
 
+import debugpy
+debugpy.listen(("0.0.0.0", 5678))
+
 app = create_app(run_as_server=False)
 
 # Provide queue names to listen to as arguments to this script,
 # similar to rqworker
 with app.app_context():
-    with Connection(sentinel.master):
-        qs = map(Queue, sys.argv[1:]) or [Queue()]
+  with Connection(sentinel.master):
+    qs = map(Queue, sys.argv[1:]) or [Queue()]
 
-        w = Worker(qs)
-        w.work()
+    w = Worker(qs)
+    w.work()

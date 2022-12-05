@@ -42,12 +42,12 @@ build: DOCKER_CONTENT_TRUST=1
 build:
 	cd .. && \
 	docker build \
-		-t $(REPOSITORY) \
-		-t $(REPOSITORY):$(APP_VERSION) \
+		-t $(REPOSITORY)-worker \
+		-t $(REPOSITORY)-worker:$(APP_VERSION) \
 		--build-arg APP_NAME="$(APP_NAME)" \
 		--build-arg VERSION="$(APP_VERSION)" \
 		--build-arg REVISION="$(COMMIT)" \
-		-f ./src/Dockerfile \
+		-f ./src/Dockerfile.worker \
 		.
 
 clean:

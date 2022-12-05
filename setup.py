@@ -8,7 +8,7 @@ requirements = [
     "alembic==0.9.10",
     "arrow==0.12.1",
     "asn1crypto==0.24.0",
-    "Babel==2.6.0",
+    "Babel==2.9.1", # 2.6.0
     "beautifulsoup4==4.7.0",
     "blinker==1.4",
     "certifi==2018.11.29",
@@ -23,6 +23,7 @@ requirements = [
     "cssselect==1.0.3",
     "debtcollector==1.20.0",
     "decorator==4.3.0",
+    "debugpy==1.6.4",
     "entrypoints==0.2.3",
     "factory-boy==2.4.1",
     "Faker==1.0.1",

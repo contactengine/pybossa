@@ -63,6 +63,10 @@ class Importer(object):
         from pybossa.model.task import Task
         """Create tasks from a remote source using an importer object and
         avoiding the creation of repeated tasks"""
+
+        import debugpy
+        debugpy.breakpoint()
+
         empty = True
         n = 0
         importer = self._create_importer_for(**form_data)

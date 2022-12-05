@@ -58,22 +58,29 @@ services:
       - pybossa_backend
 
   worker:
-    image: ai/pybossa
-    command:
-      - python
-      - app_context_rqworker.py
-      - scheduled_jobs
-      - super
-      - high
-      - medium
-      - low
-      - email
-      - maintenance
+    image: ai/pybossa-worker
+    # entrypoint:
+    #   - python
+    #   - -m
+    #   - ptvsd
+
+    # command:
+    #   - python
+    #   - app_context_rqworker.py
+    #   - scheduled_jobs
+    #   - super
+    #   - high
+    #   - medium
+    #   - low
+    #   - email
+    #   - maintenance
     restart: on-failure
     volumes:
       - ../build/environments/$ENV_NAME/settings_local.py:/app/settings_local.py
       - ../build/environments/$ENV_NAME/alembic.ini:/app/alembic.ini
       - ../build/shared-storage/uploads:/home/pybossa/uploads
+    ports:
+      - 5678:5678
     environment:
       - PYBOSSA_POSTRESQL_URI=$PYBOSSA_POSTRESQL_URI
       - PYBOSSA_REDIS_PASSWORD=$PYBOSSA_REDIS_PASSWORD

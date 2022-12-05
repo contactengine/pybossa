@@ -523,6 +523,9 @@ def send_mail(message_dict, user_id=None):
 
 def import_tasks(project_id, from_auto=False, **form_data):
     """Import tasks for a project."""
+    import debugpy
+    debugpy.breakpoint()
+
     from pybossa.core import project_repo
     project = project_repo.get(project_id)
     report = importer.create_tasks(task_repo, project_id, **form_data)

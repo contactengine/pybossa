@@ -31,7 +31,7 @@ COPY *.py ./
 COPY alembic/ alembic/
 COPY pybossa/ pybossa/
 
-FROM python:3.8-buster AS worker
+FROM python:3.8-buster AS release
 
 COPY --from=build --chown=pybossa:pybossa /app /app
 WORKDIR /app
@@ -39,36 +39,10 @@ WORKDIR /app
 ENV VIRTUAL_ENV=/app/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-RUN pip install --no-cache-dir ptvsd==4.3.2
+# RUN pip install --no-cache-dir debugpy==1.6.4
 
-ENTRYPOINT ["python", "-m ptvsd", "--host=0.0.0.0", "--port 5678", "--wait", "--multiprocess", "-m python"]
+# ENTRYPOINT ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678"]
+ENTRYPOINT [ "python" ]
 CMD ["app_context_rqworker.py", "scheduled_jobs", "super", "high", "medium", "low", "email", "maintenance"]
 
 EXPOSE 5678
-
-FROM python:3.8-slim-buster as release
-
-RUN chmod -R ug-s /bin /sbin /usr/bin \
-  && apt-get update \
-  && apt-get -y upgrade \
-  && DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install \
-  postgresql-client=11+200+deb10u5 \
-  redis-tools=5:5.0.14-1+deb10u2 \
-  dumb-init=1.2.2-1.1 \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* \
-  && addgroup --system --gid 2000 --no-create-home pybossa \
-  && adduser --system --uid 1000 --ingroup pybossa --disabled-password --gecos "" pybossa \
-  && rm -rf /tmp/*
-
-COPY --from=build --chown=pybossa:pybossa /app /app
-WORKDIR /app
-
-ENV VIRTUAL_ENV=/app/venv
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-CMD ["python", "run.py"]
-
-EXPOSE 5000
-USER 1000
